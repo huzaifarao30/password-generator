@@ -1,94 +1,103 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
-
+import { useCallback, useEffect, useRef, useState } from 'react'
+import './App.css'
 
 function App() {
-  const [length, setLength] = useState(8)
-  const [allowChar, setAllowChar] = useState(false)
-  const [allowNumber, setAllowNumber] = useState(false)
-  const [password, setPassword] = useState("")
+  const [length, setLength] = useState(12)
+  const [includeNumbers, setIncludeNumbers] = useState(true)
+  const [includeSymbols, setIncludeSymbols] = useState(false)
+  const [password, setPassword] = useState('')
 
   const passwordRef = useRef(null)
 
-  const passwordGenerator = useCallback(() => {
-    let pass = ""
-    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    if (numberAllowed) str += "0123456789"
-    if (charAllowed) str += "!@#$%^&*-_+=[]{}~`"
+  const generatePassword = useCallback(() => {
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
-    for (let i = 0; i < length; i++) {
-      let char = Math.floor(Math.random() * str.length)
-      pass += str.charAt(char)
+    if (includeNumbers) {
+      characters += '0123456789'
     }
-    setPassword(pass)
-  }, [length, numberAllowed, charAllowed, setPassword])
 
-  const copyPasswordToClipboard = useCallback(() => {
-    passwordRef.current?.select();
-    passwordRef.current?.setSelectionRange(0, 999);
-    window.navigator.clipboard.writeText(password)
+    if (includeSymbols) {
+      characters += '!@#$%^&*-_+=[]{}~`'
+    }
+
+    let nextPassword = ''
+
+    for (let index = 0; index < length; index += 1) {
+      const randomIndex = Math.floor(Math.random() * characters.length)
+      nextPassword += characters.charAt(randomIndex)
+    }
+
+    setPassword(nextPassword)
+  }, [includeNumbers, includeSymbols, length])
+
+  const copyPasswordToClipboard = useCallback(async () => {
+    if (passwordRef.current) {
+      passwordRef.current.select()
+      passwordRef.current.setSelectionRange(0, 999)
+    }
+
+    await window.navigator.clipboard.writeText(password)
   }, [password])
-  
+
   useEffect(() => {
-    passwordGenerator()
-  }, [length, numberAllowed, charAllowed, passwordGenerator])
+    generatePassword()
+  }, [generatePassword])
+
+  return (
+    <main className="app-shell">
+      <section className="generator-card">
+        <p className="eyebrow">Secure random generator</p>
+        <h1>Password Generator</h1>
+        <p className="subtitle">
+          Create a quick password with the length and characters you want.
+        </p>
+
+        <div className="password-row">
+          <input
+            ref={passwordRef}
+            type="text"
+            value={password}
+            readOnly
+            placeholder="Your password appears here"
+          />
+          <button type="button" onClick={copyPasswordToClipboard}>
+            Copy
+          </button>
+        </div>
+
+        <div className="controls">
+          <label className="control control-range">
+            <span>Length: {length}</span>
+            <input
+              type="range"
+              min="6"
+              max="32"
+              value={length}
+              onChange={(event) => setLength(Number(event.target.value))}
+            />
+          </label>
+
+          <label className="control control-check">
+            <input
+              type="checkbox"
+              checked={includeNumbers}
+              onChange={() => setIncludeNumbers((previous) => !previous)}
+            />
+            <span>Include numbers</span>
+          </label>
+
+          <label className="control control-check">
+            <input
+              type="checkbox"
+              checked={includeSymbols}
+              onChange={() => setIncludeSymbols((previous) => !previous)}
+            />
+            <span>Include symbols</span>
+          </label>
+        </div>
+      </section>
+    </main>
+  )
 }
-
-return (
-
-  <div className="w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500">
-    <h1 className='text-white text-center my-3'>Password generator</h1>
-    <div className="flex shadow rounded-lg overflow-hidden mb-4">
-      <input
-        type="text"
-        value={password}
-        className="outline-none w-full py-1 px-3"
-        placeholder="Password"
-        readOnly
-        ref={passwordRef}
-      />
-      <button
-        onClick={copyPasswordToClipboard}
-        className='outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0'
-      >copy</button>
-
-    </div>
-    <div className='flex text-sm gap-x-2'>
-      <div className='flex items-center gap-x-1'>
-        <input
-          type="range"
-          min={6}
-          max={100}
-          value={length}
-          className='cursor-pointer'
-          onChange={(e) => { setLength(e.target.value) }}
-        />
-        <label>Length: {length}</label>
-      </div>
-      <div className="flex items-center gap-x-1">
-        <input
-          type="checkbox"
-          defaultChecked={numberAllowed}
-          id="numberInput"
-          onChange={() => {
-            setNumberAllowed((prev) => !prev);
-          }}
-        />
-        <label htmlFor="numberInput">Numbers</label>
-      </div>
-      <div className="flex items-center gap-x-1">
-        <input
-          type="checkbox"
-          defaultChecked={charAllowed}
-          id="characterInput"
-          onChange={() => {
-            setCharAllowed((prev) => !prev)
-          }}
-        />
-        <label htmlFor="characterInput">Characters</label>
-      </div>
-    </div>
-  </div>
-
-)
 
 export default App
