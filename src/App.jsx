@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
   const [length, setLength] = useState(12)
-  const [includeNumbers, setIncludeNumbers] = useState(true)
+  const [includeNumbers, setIncludeNumbers] = useState(false)
   const [includeSymbols, setIncludeSymbols] = useState(false)
   const [password, setPassword] = useState('')
 
