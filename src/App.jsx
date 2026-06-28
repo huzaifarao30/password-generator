@@ -46,10 +46,10 @@ function App() {
   return (
     <main className="app-shell">
       <section className="generator-card">
-        <p className="eyebrow">Secure random generator</p>
+        <p className="eyebrow">Secure password generator</p>
         <h1>Password Generator</h1>
         <p className="subtitle">
-          Create a quick password with the length and characters you want.
+          Create a strong password in seconds with the options you choose.
         </p>
 
         <div className="password-row">
